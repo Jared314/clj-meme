@@ -25,13 +25,12 @@
 
 (defn- overlay-text [^BufferedImage image top-caption bottom-caption]
   (let [g (.getGraphics image)]
-    (drawStringCentered g top-caption image true)
-    (drawStringCentered g bottom-caption image false)
+    (when top-caption (drawStringCentered g top-caption image true))
+    (when bottom-caption (drawStringCentered g bottom-caption image false))
     image))
 
 
-
-;; Returns PNG compressed byte[] data
+;; Returns java.awt.image.BufferedImage
 (defn render-image [image-path top-caption bottom-caption]
   (-> (io/file image-path)
       ImageIO/read
