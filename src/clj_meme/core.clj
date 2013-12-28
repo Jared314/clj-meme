@@ -1,11 +1,15 @@
 (ns clj-meme.core
   (:require [clojure.java.io :as io]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [clojure.pprint :as pp])
   (:import [com.amazonaws.memes ImageOverlay]
            [javax.imageio ImageIO]
            [java.io ByteArrayOutputStream]
-           [java.awt.image BufferedImage]))
+           [java.awt.image BufferedImage]
+           [java.awt Font FontMetrics Color Graphics]
+           [java.awt.geom Rectangle2D]))
 
+(set! *warn-on-reflection* true)
 ;; Defaults
 (def MAX_FONT_SIZE 48)
 (def BOTTOM_MARGIN 10)
@@ -13,15 +17,40 @@
 (def SIDE_MARGIN 10)
 
 
-(defn- drawStringCentered [g text image top]
-  (ImageOverlay/drawStringCentered g
-                                   text
-                                   image
-                                   top
-                                   TOP_MARGIN
-                                   BOTTOM_MARGIN
-                                   SIDE_MARGIN
-                                   MAX_FONT_SIZE))
+
+(defn- drawStringCentered2 [^Graphics g
+                            ^BufferedImage image
+                            y
+                            line]
+  (let [stringBounds (.. g getFontMetrics (getStringBounds line g))
+        x (int (/ (- (.getWidth image) (.getWidth stringBounds)) 2))]
+    (doto g
+      (.setColor Color/BLACK)
+      (.drawString line (+ x 2) (+ y 2))
+      (.setColor Color/WHITE)
+      (.drawString line x y))
+    (+ y (.. g getFontMetrics getHeight))))
+
+(defn- drawStringCentered
+  ([g text image top]
+   (let [d (ImageOverlay/calculateText g text image SIDE_MARGIN MAX_FONT_SIZE)]
+     (drawStringCentered g
+                         (.FormattedText d)
+                         image
+                         top
+                         (.Height d)
+                         (.FontSize d)
+                         TOP_MARGIN
+                         BOTTOM_MARGIN)))
+  ([^Graphics g text image top height fontsize top-margin bottom-margin]
+   (let [y (if top
+             (+ TOP_MARGIN (-> g (.getFontMetrics) (.getHeight)))
+             (+ (-> g (.getFontMetrics) (.getHeight))
+                (- (.getHeight image) height BOTTOM_MARGIN)))]
+     (.setFont g (Font. "Arial" Font/BOLD fontsize))
+     (reduce (partial drawStringCentered2 g image)
+             y
+             (string/split-lines text)))))
 
 (defn- overlay-text [^BufferedImage image top-caption bottom-caption]
   (let [g (.getGraphics image)]
