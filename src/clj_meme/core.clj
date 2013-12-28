@@ -13,13 +13,6 @@
     (ImageOverlay/drawStringCentered g bottom-caption image false)
     image))
 
-(defn- readImageIntoBuffer [image]
-  (let [baos (ByteArrayOutputStream.)]
-    (try
-      (ImageIO/write image "png" baos)
-      (.toByteArray baos)
-      (finally (.close baos)))))
-
 
 
 ;; Returns PNG compressed byte[] data
