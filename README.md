@@ -1,16 +1,36 @@
 # clj-meme
 
-A Clojure library designed to generate meme images.
+A Clojure library designed to locally generate meme images.
 
 ## Usage
 
-    (ns namespace1
+Generate a `java.awt.image.BufferedImage` with the specified text:
+
+    (ns myns
+      (:require [clj-meme.core :as meme]))
+
+    (meme/render-image "./sadkitten.png"
+                       "Top Text"
+                       "Bottom Text")
+
+Generate a PNG encoded image and return the data as a byte array:
+
+    (ns myns
+      (:require [clj-meme.core :as meme]))
+
+    (meme/generate-image "./sadkitten.png"
+                         "Top Text"
+                         "Bottom Text") ;; #<byte[] [B@27f8d56c>
+
+Generate a PNG encoded image, write the image to the specified file, and return the success of the file operation:
+
+    (ns myns
       (:require [clj-meme.core :as meme]))
 
     (meme/generate-image! "./sadkitten.png"
                           "Top Text"
                           "Bottom Text"
-                          "./output1.png")
+                          "./output1.png") ;; true
 
 ## License
 
