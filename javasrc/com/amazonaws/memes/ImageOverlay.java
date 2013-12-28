@@ -19,32 +19,24 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 /**
  * Worker that knows how to overlay text onto an image.
  */
 public class ImageOverlay {
 
-    private static final int MAX_FONT_SIZE = 48;
-    private static final int BOTTOM_MARGIN = 10;
-    private static final int TOP_MARGIN = 5;
-    private static final int SIDE_MARGIN = 10;
-    private static final String TOP_TEXT = "This is a long bit of text on the top, but don't worry, this algorithm will take care of it";
-    private static final String BOTTOM_TEXT = "NOPE";
-
-    private static final String INPUT_IMAGE = "/tmp/CHANGEME";
-    private static final String CAPTION_FILE = "/tmp/CHANGEME.out";
-
-
     /**
      * Draws the given string centered, as big as possible, on either the top or
      * bottom 20% of the image given.
      */
-    public static void drawStringCentered(Graphics g, String text, BufferedImage image, boolean top)
+    public static void drawStringCentered(Graphics g,
+                                          String text,
+                                          BufferedImage image,
+                                          boolean top,
+                                          int TOP_MARGIN,
+                                          int BOTTOM_MARGIN,
+                                          int SIDE_MARGIN,
+                                          int MAX_FONT_SIZE)
     {
         if (text == null)
             text = "";
