@@ -34,26 +34,17 @@ public class ImageOverlay {
     private static final int TOP_MARGIN = 5;
     private static final int SIDE_MARGIN = 10;
     private static final String TOP_TEXT = "This is a long bit of text on the top, but don't worry, this algorithm will take care of it";
-    // private static final String BOTTOM_TEXT =
-    // "Some long text is too long for one line, and if we continue it gets really long indeed";
     private static final String BOTTOM_TEXT = "NOPE";
 
     private static final String INPUT_IMAGE = "/tmp/CHANGEME";
     private static final String CAPTION_FILE = "/tmp/CHANGEME.out";
 
-    public static BufferedImage overlay(BufferedImage image, String topCaption, String bottomCaption)
-            throws IOException {
-        Graphics graphics = image.getGraphics();
-        drawStringCentered(graphics, topCaption, image, true);
-        drawStringCentered(graphics, bottomCaption, image, false);
-        return image;
-    }
 
     /**
      * Draws the given string centered, as big as possible, on either the top or
      * bottom 20% of the image given.
      */
-    private static void drawStringCentered(Graphics g, String text, BufferedImage image, boolean top)
+    public static void drawStringCentered(Graphics g, String text, BufferedImage image, boolean top)
     {
         if (text == null)
             text = "";
