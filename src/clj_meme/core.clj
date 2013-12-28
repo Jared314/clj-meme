@@ -33,15 +33,8 @@
 
 (defn- drawStringCentered
   ([g text image top]
-   (let [d (ImageOverlay/calculateText g text image SIDE_MARGIN MAX_FONT_SIZE)]
-     (drawStringCentered g
-                         (.FormattedText d)
-                         image
-                         top
-                         (.Height d)
-                         (.FontSize d)
-                         TOP_MARGIN
-                         BOTTOM_MARGIN)))
+   (let [{:keys [formattedtext fontsize height]} (ImageOverlay/calculateText g text image SIDE_MARGIN MAX_FONT_SIZE)]
+     (drawStringCentered g formattedtext image top height fontsize TOP_MARGIN BOTTOM_MARGIN)))
   ([^Graphics g text image top height fontsize top-margin bottom-margin]
    (let [y (if top
              (+ TOP_MARGIN (-> g (.getFontMetrics) (.getHeight)))

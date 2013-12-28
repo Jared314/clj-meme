@@ -19,96 +19,75 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import clojure.lang.Keyword;
+import clojure.lang.PersistentHashMap;
 
 /**
  * Worker that knows how to overlay text onto an image.
  */
-public class ImageOverlay {
+public final class ImageOverlay {
 
-    /**
-     * Draws the given string centered, as big as possible, on either the top or
-     * bottom 20% of the image given.
-     */
-    public static void drawStringCentered(Graphics g,
-                                          String text,
-                                          BufferedImage image,
-                                          boolean top,
-                                          int TOP_MARGIN,
-                                          int BOTTOM_MARGIN,
-                                          int SIDE_MARGIN,
-                                          int MAX_FONT_SIZE)
-    {
-        if (text == null)
-            text = "";
+  public static PersistentHashMap calculateText(Graphics g,
+                                  String text,
+                                  BufferedImage image,
+                                  int SIDE_MARGIN,
+                                  int MAX_FONT_SIZE)
+  {
+    int height = 0;
+    int fontSize = MAX_FONT_SIZE;
+    int maxCaptionHeight = image.getHeight() / 5;
+    int maxLineWidth = image.getWidth() - SIDE_MARGIN * 2;
+    String formattedString = "";
 
-        int height = 0;
-        int fontSize = MAX_FONT_SIZE;
-        int maxCaptionHeight = image.getHeight() / 5;
-        int maxLineWidth = image.getWidth() - SIDE_MARGIN * 2;
-        String formattedString = "";
+    do {
+      g.setFont(new Font("Arial", Font.BOLD, fontSize));
 
-        do {
-            g.setFont(new Font("Arial", Font.BOLD, fontSize));
+      // first inject newlines into the text to wrap properly
+      StringBuilder sb = new StringBuilder();
+      int left = 0;
+      int right = text.length() - 1;
+      while ( left < right ) {
 
-            // first inject newlines into the text to wrap properly
-            StringBuilder sb = new StringBuilder();
-            int left = 0;
-            int right = text.length() - 1;
-            while ( left < right ) {
+        String substring = text.substring(left, right + 1);
+        Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(substring, g);
+        while ( stringBounds.getWidth() > maxLineWidth ) {
 
-                String substring = text.substring(left, right + 1);
-                Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(substring, g);
-                while ( stringBounds.getWidth() > maxLineWidth ) {
-
-                    // look for a space to break the line
-                    boolean spaceFound = false;
-                    for ( int i = right; i > left; i-- ) {
-                        if ( text.charAt(i) == ' ' ) {
-                            right = i - 1;
-                            spaceFound = true;
-                            break;
-                        }
-                    }
-                    substring = text.substring(left, right + 1);
-                    stringBounds = g.getFontMetrics().getStringBounds(substring, g);
-
-                    // If we're down to a single word and we are still too wide,
-                    // the font is just too big.
-                    if ( !spaceFound && stringBounds.getWidth() > maxLineWidth ) {
-                        break;
-                    }
-                }
-                sb.append(substring).append("\n");
-                left = right + 2;
-                right = text.length() - 1;
+          // look for a space to break the line
+          boolean spaceFound = false;
+          for ( int i = right; i > left; i-- ) {
+            if ( text.charAt(i) == ' ' ) {
+              right = i - 1;
+              spaceFound = true;
+              break;
             }
+          }
+          substring = text.substring(left, right + 1);
+          stringBounds = g.getFontMetrics().getStringBounds(substring, g);
 
-            formattedString = sb.toString();
-
-            // now determine if this font size is too big for the allowed height
-            height = 0;
-            for ( String line : formattedString.split("\n") ) {
-                Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(line, g);
-                height += stringBounds.getHeight();
-            }
-            fontSize--;
-        } while ( height > maxCaptionHeight );
-
-        // draw the string one line at a time
-        int y = 0;
-        if ( top ) {
-            y = TOP_MARGIN + g.getFontMetrics().getHeight();
-        } else {
-            y = image.getHeight() - height - BOTTOM_MARGIN + g.getFontMetrics().getHeight();
+          // If we're down to a single word and we are still too wide,
+          // the font is just too big.
+          if ( !spaceFound && stringBounds.getWidth() > maxLineWidth ) {
+            break;
+          }
         }
-        for ( String line : formattedString.split("\n") ) {
-            // Draw each string twice for a shadow effect
-            Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(line, g);
-            g.setColor(Color.BLACK);
-            g.drawString(line, (image.getWidth() - (int) stringBounds.getWidth()) / 2 + 2, y + 2);
-            g.setColor(Color.WHITE);
-            g.drawString(line, (image.getWidth() - (int) stringBounds.getWidth()) / 2, y);
-            y += g.getFontMetrics().getHeight();
-        }
-    }
+        sb.append(substring).append("\n");
+        left = right + 2;
+        right = text.length() - 1;
+      }
+
+      formattedString = sb.toString();
+
+      // now determine if this font size is too big for the allowed height
+      height = 0;
+      for ( String line : formattedString.split("\n") ) {
+        Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(line, g);
+        height += stringBounds.getHeight();
+      }
+      fontSize--;
+    } while ( height > maxCaptionHeight );
+
+    return PersistentHashMap.create(Keyword.intern("formattedtext"), formattedString,
+                                    Keyword.intern("fontsize"), fontSize,
+                                    Keyword.intern("height"), height);
+  }
 }
