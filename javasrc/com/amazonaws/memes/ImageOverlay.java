@@ -14,7 +14,6 @@
  */
 package com.amazonaws.memes;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
@@ -41,6 +40,7 @@ public final class ImageOverlay {
 
     do {
       g.setFont(new Font("Arial", Font.BOLD, fontSize));
+
 
       // first inject newlines into the text to wrap properly
       StringBuilder sb = new StringBuilder();
@@ -78,11 +78,8 @@ public final class ImageOverlay {
       formattedString = sb.toString();
 
       // now determine if this font size is too big for the allowed height
-      height = 0;
-      for ( String line : formattedString.split("\n") ) {
-        Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(line, g);
-        height += stringBounds.getHeight();
-      }
+      height = calculateHeight(g, formattedString);
+
       fontSize--;
     } while ( height > maxCaptionHeight );
 
@@ -90,4 +87,17 @@ public final class ImageOverlay {
                                     Keyword.intern("fontsize"), fontSize,
                                     Keyword.intern("height"), height);
   }
+
+  public static int calculateHeight(Graphics g, String formattedString)
+  {
+    int height = 0;
+    for ( String line : formattedString.split("\n") ) {
+      Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(line, g);
+      height += stringBounds.getHeight();
+    }
+    return height;
+  }
+
+
+
 }
