@@ -38,17 +38,15 @@ Generate a PNG encoded image from an exception:
     (ns myns
       (:require [clj-meme.core :as meme]))
 
-    (defn handle-exception [output-path ^Exception ex]
+    (defn handle-exception [^Exception ex]
       (meme/generate-image! "./sadkitten.png"
                    (.getName (type ex))
                    (.getMessage ex)
-                   output-path))
+                   (str "./exception-"
+                        (System/currentTimeMillis)
+                        ".png")))
 
-    (def handle (partial handle-exception (str "./exception-"
-                                               (System/currentTimeMillis)
-                                               ".png")))
-
-    (handle (ArithmeticException. "Divide by zero")) ;; true
+    (handle-exception (ArithmeticException. "Divide by zero")) ;; true
 
 ![example output](https://github.com/Jared314/clj-meme/raw/master/example.png)
 
