@@ -11,7 +11,7 @@ Generate a `java.awt.image.BufferedImage` with the specified text:
 
     (meme/render-image "./sadkitten.png"
                        "Top Text"
-                       "Bottom Text")
+                       "Bottom Text") ;; #<BufferedImage BufferedImage@...
 
 Generate a PNG encoded image and return the data as a byte array:
 
