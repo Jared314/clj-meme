@@ -33,6 +33,7 @@ public final class ImageOverlay {
                                   int MAX_FONT_SIZE)
   {
     int height = 0;
+    int linewidth = 0;
     int fontSize = MAX_FONT_SIZE;
     int maxCaptionHeight = image.getHeight() / 5;
     int maxLineWidth = image.getWidth() - SIDE_MARGIN * 2;
@@ -78,24 +79,29 @@ public final class ImageOverlay {
       formattedString = sb.toString();
 
       // now determine if this font size is too big for the allowed height
-      height = calculateHeight(g, formattedString);
+      int[] size = calculateHeight(g, formattedString);
+      height = size[0];
+      linewidth = size[1];
 
       fontSize--;
-    } while ( height > maxCaptionHeight );
+    } while ( height > maxCaptionHeight || linewidth > maxLineWidth);
 
     return PersistentHashMap.create(Keyword.intern("formattedtext"), formattedString,
                                     Keyword.intern("fontsize"), fontSize,
                                     Keyword.intern("height"), height);
   }
 
-  public static int calculateHeight(Graphics g, String formattedString)
+  public static int[] calculateHeight(Graphics g, String formattedString)
   {
     int height = 0;
+    int maxWidth = -1;
     for ( String line : formattedString.split("\n") ) {
       Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(line, g);
       height += stringBounds.getHeight();
+      int w = (int)Math.ceil(stringBounds.getWidth());
+      if(w > maxWidth) maxWidth = w;
     }
-    return height;
+    return new int[] { height, maxWidth };
   }
 
 
