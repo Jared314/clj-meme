@@ -42,44 +42,11 @@ public final class ImageOverlay {
     do {
       g.setFont(new Font("Arial", Font.BOLD, fontSize));
 
-
       // first inject newlines into the text to wrap properly
-      StringBuilder sb = new StringBuilder();
-      int left = 0;
-      int right = text.length() - 1;
-      while ( left < right ) {
-
-        String substring = text.substring(left, right + 1);
-        Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(substring, g);
-        while ( stringBounds.getWidth() > maxLineWidth ) {
-
-          // look for a space to break the line
-          boolean spaceFound = false;
-          for ( int i = right; i > left; i-- ) {
-            if ( text.charAt(i) == ' ' ) {
-              right = i - 1;
-              spaceFound = true;
-              break;
-            }
-          }
-          substring = text.substring(left, right + 1);
-          stringBounds = g.getFontMetrics().getStringBounds(substring, g);
-
-          // If we're down to a single word and we are still too wide,
-          // the font is just too big.
-          if ( !spaceFound && stringBounds.getWidth() > maxLineWidth ) {
-            break;
-          }
-        }
-        sb.append(substring).append("\n");
-        left = right + 2;
-        right = text.length() - 1;
-      }
-
-      formattedString = sb.toString();
+      formattedString = wrapString(g, text, maxLineWidth);
 
       // now determine if this font size is too big for the allowed height
-      int[] size = calculateHeight(g, formattedString);
+      int[] size = calculateSize(g, formattedString);
       height = size[0];
       linewidth = size[1];
 
@@ -91,7 +58,47 @@ public final class ImageOverlay {
                                     Keyword.intern("height"), height);
   }
 
-  public static int[] calculateHeight(Graphics g, String formattedString)
+  public static String wrapString(Graphics g, String text, int maxLineWidth)
+  {
+    StringBuilder sb = new StringBuilder();
+    int left = 0;
+    int right = text.length() - 1;
+    while ( left < right )
+    {
+
+      String substring = text.substring(left, right + 1);
+      Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(substring, g);
+
+      while ( stringBounds.getWidth() > maxLineWidth ) {
+
+        // look for a space to break the line
+        boolean spaceFound = false;
+        for ( int i = right; i > left; i-- ) {
+          if ( text.charAt(i) == ' ' ) {
+            right = i - 1;
+            spaceFound = true;
+            break;
+          }
+        }
+
+        substring = text.substring(left, right + 1);
+        stringBounds = g.getFontMetrics().getStringBounds(substring, g);
+
+        // If we're down to a single word and we are still too wide,
+        // the font is just too big.
+        if ( !spaceFound && stringBounds.getWidth() > maxLineWidth ) {
+          break;
+        }
+      }
+      sb.append(substring).append("\n");
+      left = right + 2;
+      right = text.length() - 1;
+    }
+
+    return sb.toString();
+  }
+
+  public static int[] calculateSize(Graphics g, String formattedString)
   {
     int height = 0;
     int maxWidth = -1;
