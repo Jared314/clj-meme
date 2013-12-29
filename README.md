@@ -50,6 +50,7 @@ Generate a PNG encoded image from an exception:
 
     (handle (ArithmeticException. "Divide by zero")) ;; true
 
+![example output](https://github.com/Jared314/clj-meme/raw/master/example.png)
 
 ## License
 
