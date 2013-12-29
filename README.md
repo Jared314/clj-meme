@@ -32,6 +32,25 @@ Generate a PNG encoded image, write the image to the specified file, and return 
                           "Bottom Text"
                           "./output1.png") ;; true
 
+
+Generate a PNG encoded image from an exception:
+
+    (ns myns
+      (:require [clj-meme.core :as meme]))
+
+    (defn handle-exception [output-path ^Exception ex]
+      (meme/generate-image! "./sadkitten.png"
+                   (.getName (type ex))
+                   (.getMessage ex)
+                   output-path))
+
+    (def handle (partial handle-exception (str "./exception-"
+                                               (System/currentTimeMillis)
+                                               ".png")))
+
+    (handle (ArithmeticException. "Divide by zero")) ;; true
+
+
 ## License
 
 Copyright © 2013 Jared Lobberecht
