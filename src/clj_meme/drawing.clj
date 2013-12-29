@@ -1,4 +1,4 @@
-(ns clj-meme.core
+(ns clj-meme.drawing
   (:require [clojure.string :as string])
   (:import [com.amazonaws.memes ImageOverlay]
            [java.io ByteArrayOutputStream]
@@ -12,10 +12,13 @@
 (def TOP_MARGIN 5)
 (def SIDE_MARGIN 10)
 
-(defn- drawStringCentered2 [^Graphics g
-                            ^BufferedImage image
-                            y
-                            line]
+(defn calculate-text
+  ([g text image]
+   (calculate-text g text image SIDE_MARGIN MAX_FONT_SIZE))
+  ([g text image side-margin max-font-size]
+   (ImageOverlay/calculateText g text image side-margin max-font-size)))
+
+(defn- drawStringCentered2 [^Graphics g image y line]
   (let [stringBounds (.. g getFontMetrics (getStringBounds line g))
         x (int (/ (- (.getWidth image) (.getWidth stringBounds)) 2))]
     (doto g
@@ -27,7 +30,7 @@
 
 (defn drawStringCentered
   ([g text image top]
-   (let [{:keys [formattedtext fontsize height]} (ImageOverlay/calculateText g text image SIDE_MARGIN MAX_FONT_SIZE)]
+   (let [{:keys [formattedtext fontsize height]} (calculate-text g text image)]
      (drawStringCentered g formattedtext image top height fontsize TOP_MARGIN BOTTOM_MARGIN)))
   ([^Graphics g text image top height fontsize top-margin bottom-margin]
    (let [y (if top
