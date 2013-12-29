@@ -40,11 +40,11 @@ Generate a PNG encoded image from an exception:
 
     (defn handle-exception [^Exception ex]
       (meme/generate-image! "./sadkitten.png"
-                   (.getName (type ex))
-                   (.getMessage ex)
-                   (str "./exception-"
-                        (System/currentTimeMillis)
-                        ".png")))
+                            (.getName (type ex))
+                            (.getMessage ex)
+                            (str "./exception-"
+                                 (System/currentTimeMillis)
+                                 ".png")))
 
     (handle-exception (ArithmeticException. "Divide by zero")) ;; true
 
