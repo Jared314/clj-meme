@@ -2,6 +2,12 @@
 
 A Clojure library designed to locally generate meme images.
 
+## Installation
+
+`clj-meme` is available via [Clojars](http://clojars.org/clj-meme).
+
+Add `[clj-meme "0.1.0"]` into the `:dependencies` vector of your project.clj.
+
 ## Usage
 
 Generate a `java.awt.image.BufferedImage` with the specified text:
