@@ -26,38 +26,6 @@ import clojure.lang.PersistentHashMap;
  */
 public final class ImageOverlay {
 
-  public static PersistentHashMap calculateText(Graphics g,
-                                  String text,
-                                  BufferedImage image,
-                                  int SIDE_MARGIN,
-                                  int MAX_FONT_SIZE)
-  {
-    int height = 0;
-    int linewidth = 0;
-    int fontSize = MAX_FONT_SIZE;
-    int maxCaptionHeight = image.getHeight() / 5;
-    int maxLineWidth = image.getWidth() - SIDE_MARGIN * 2;
-    String formattedString = "";
-
-    do {
-      g.setFont(new Font("Arial", Font.BOLD, fontSize));
-
-      // first inject newlines into the text to wrap properly
-      formattedString = wrapString(g, text, maxLineWidth);
-
-      // now determine if this font size is too big for the allowed height
-      int[] size = calculateSize(g, formattedString);
-      height = size[0];
-      linewidth = size[1];
-
-      fontSize--;
-    } while ( height > maxCaptionHeight || linewidth > maxLineWidth);
-
-    return PersistentHashMap.create(Keyword.intern("formattedtext"), formattedString,
-                                    Keyword.intern("fontsize"), fontSize,
-                                    Keyword.intern("height"), height);
-  }
-
   public static String wrapString(Graphics g, String text, int maxLineWidth)
   {
     StringBuilder sb = new StringBuilder();

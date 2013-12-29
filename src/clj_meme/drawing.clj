@@ -16,7 +16,17 @@
   ([g text image]
    (calculate-text g text image SIDE_MARGIN MAX_FONT_SIZE))
   ([g text image side-margin max-font-size]
-   (ImageOverlay/calculateText g text image side-margin max-font-size)))
+   (let [maxCaptionHeight (/ (.getHeight image) 5) ;; 1/5th image height
+         maxLineWidth (- (.getWidth image) (* SIDE_MARGIN 2))]
+     (loop [fontsize max-font-size]
+       (.setFont g (Font. "Arial" Font/BOLD fontsize))
+       (let [formattedString (ImageOverlay/wrapString g text maxLineWidth)
+             [h linewidth] (ImageOverlay/calculateSize g formattedString)]
+         (if (and (<= h maxCaptionHeight) (<= linewidth maxLineWidth))
+           {:fontsize fontsize
+            :height h
+            :formattedtext formattedString}
+           (recur (dec fontsize))))))))
 
 (defn- drawStringCentered2 [^Graphics g image y line]
   (let [stringBounds (.. g getFontMetrics (getStringBounds line g))
