@@ -12,6 +12,15 @@
 (def TOP_MARGIN 5)
 (def SIDE_MARGIN 10)
 
+(defn- calculateSize [g text]
+  (reduce
+   (fn [[h maxWidth] line]
+     (let [stringBounds (.. g getFontMetrics (getStringBounds line g))]
+       [(+ h (.getHeight stringBounds))
+        (max maxWidth (Math/ceil (.getWidth stringBounds)))]))
+   [0 0]
+   (string/split-lines text)))
+
 (defn calculate-text
   ([g text image]
    (calculate-text g text image SIDE_MARGIN MAX_FONT_SIZE))
@@ -21,10 +30,10 @@
      (loop [fontsize max-font-size]
        (.setFont g (Font. "Arial" Font/BOLD fontsize))
        (let [formattedString (ImageOverlay/wrapString g text maxLineWidth)
-             [h linewidth] (ImageOverlay/calculateSize g formattedString)]
+             [h linewidth] (calculateSize g formattedString)]
          (if (and (<= h maxCaptionHeight) (<= linewidth maxLineWidth))
            {:fontsize fontsize
-            :height h
+            :height (int h)
             :formattedtext formattedString}
            (recur (dec fontsize))))))))
 

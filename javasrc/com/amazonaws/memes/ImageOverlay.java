@@ -18,8 +18,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import clojure.lang.Keyword;
-import clojure.lang.PersistentHashMap;
 
 /**
  * Worker that knows how to overlay text onto an image.
@@ -65,20 +63,4 @@ public final class ImageOverlay {
 
     return sb.toString();
   }
-
-  public static int[] calculateSize(Graphics g, String formattedString)
-  {
-    int height = 0;
-    int maxWidth = -1;
-    for ( String line : formattedString.split("\n") ) {
-      Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(line, g);
-      height += stringBounds.getHeight();
-      int w = (int)Math.ceil(stringBounds.getWidth());
-      if(w > maxWidth) maxWidth = w;
-    }
-    return new int[] { height, maxWidth };
-  }
-
-
-
 }
